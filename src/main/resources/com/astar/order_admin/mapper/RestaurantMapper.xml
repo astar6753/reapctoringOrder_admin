@@ -1,0 +1,84 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.astar.order_admin.mapper.RestaurantMapper">
+<resultMap id="restaurantViewResponseMap" type="com.astar.order_admin.data.request.restaurant.RestaurantAddRequestVO">
+    <id property="restSeq" column="ri_seq"/>
+    <result property="memberSeq" column="ri_mi_seq"/>
+    <result property="restName" column="ri_name"/>
+    <result property="restMinPrice" column="ri_min_price"/>
+    <result property="restDeliveryFee" column="ri_delivery_fee"/>
+    <result property="restAddress" column="ri_address"/>
+    <result property="restOpenTime" column="ri_open_time"/>
+    <result property="restEndTime" column="ri_end_time"/>
+    <result property="restDescription" column="ri_description"/>
+    <result property="cateSeq" column="ri_cate_seq"/>
+    <result property="cateName" column="cate_name"/>
+    <result property="imgSeq" column="ri_img_seq"/>
+    <result property="imgFile" column="img_file"/>
+</resultMap>
+<resultMap id="categoryResponseVOMap" type="com.astar.order_admin.data.response.category.CategoryResponseVO">
+    <id property="cateSeq" column="cate_seq"/>
+    <result property="cateName" column="cate_name"/>
+</resultMap>
+
+    <insert id="insertRestaurantInfo">
+        INSERT INTO restaurant_info
+        (ri_mi_seq, ri_name, ri_min_price, ri_delivery_fee, ri_address, ri_cate_seq, ri_open_time, ri_end_time, ri_description)
+        VALUES
+        (#{meberSeq}, #{restName}, #{restMinPrice}, #{restDeliveryFee}, #{restAddress}, #{restCateSeq}, #{restOpenTime}, #{restEndTime}, #{restDescription})
+    </insert>
+    <select id="selectRestaurantViewByUser" resultMap="restaurantViewResponseMap">
+        SELECT 
+            ri_seq, ri_mi_seq, ri_name, ri_min_price, ri_delivery_fee,
+            ri_address, ri_open_time, ri_end_time, ri_description, ri_cate_seq,
+            cate_name, ri_img_seq, img_file
+        FROM restaurant_view
+        WHERE ri_mi_seq = #{memberSeq}
+        <if test="keyword != null">
+        AND ri_name Like CONCAT('%',#{keyword},'%')
+        </if>
+        LIMIT 20 OFFSET #{offset}
+    </select>
+    <select id="selectRestaurantViewTotalCntByUser" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM restaurant_view
+        WHERE ri_mi_seq = #{memberSeq}
+        <if test="keyword != null">
+        AND ri_name Like CONCAT('%',#{keyword},'%')
+        </if>
+    </select>
+    <select id="selectRestaurantViewPageByUser" resultType="java.lang.Integer">
+        SELECT CEIL(COUNT(*)/20)
+        FROM restaurant_view
+        WHERE ri_mi_seq = #{memberSeq}
+        <if test="keyword != null">
+        AND ri_name Like CONCAT('%',#{keyword},'%')
+        </if>
+    </select>
+    <update id="updateRestaurantInfo">
+        UPDATE restaurant_info
+        SET 
+            ri_name=#{restName},
+            ri_min_price=#{restMinPrice},
+            ri_delivery_fee=#{restDeliveryFee},
+            ri_address=#{restAddress},
+            ri_cate_seq=#{restCateSeq}
+            ri_open_time=#{restOpenTime}
+            ri_end_time=#{restEndTime}
+            ri_description=#{restDescription}
+        WHERE ri_seq= #{restSeq} AND ri_mi_seq = #{meberSeq}
+    </update>
+    <delete id="deleteRestaurantInfoBySeq">
+        DELETE FROM restaurant_info
+        WHERE ri_seq = #{restSeq} AND ri_mi_seq = #{memberSeq}
+    </delete>
+
+    
+    <select id="selectCategoryList" resultType="categoryResponseVOMap">
+        SELECT cate_seq, cate_name
+        FROM category_info
+        WHERE cate_name like CONCAT('%',#{keyword},'%')
+        LIMIT 10
+    </select>
+
+</mapper>

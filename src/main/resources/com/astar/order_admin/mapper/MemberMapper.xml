@@ -1,0 +1,49 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.astar.order_admin.mapper.MemberMapper">
+<resultMap id="memberResponseMap" type="com.astar.order_admin.data.response.member.MemberResponseVO">
+    <id property="memberSeq" column="mi_seq"/>
+    <result property="memberId" column="mi_id"/>
+    <result property="memberName" column="mi_name"/>
+    <result property="memberPhone" column="mi_phone"/>
+    <result property="memberAddress" column="mi_address"/>
+    <result property="memberStatus" column="mi_status"/>
+    <result property="memberGrade" column="mi_grade"/>
+    <result property="imgSeq" column="mi_img_seq"/>
+</resultMap>
+
+    <insert id="insertMemberInfo"
+        parameterType="com.astar.order_admin.data.request.member.MemberRequestVO"
+        useGeneratedKeys="true" keyProperty="mi_seq">
+        INSERT INTO member_info
+        (mi_id, mi_pwd, mi_name, mi_phone, mi_grade, mi_address)
+        VALUES
+        (#{memberId}, #{memberPwd}, #{memberName}, #{memberPhone}, 2, #{memberAddress})
+    </insert>
+    <select id="selectMemberLogin" resultMap="memberResponseMap">
+        SELECT mi_seq, mi_id, mi_name, mi_phone, mi_img_seq, mi_status, mi_grade
+        FROM member_info
+        WHERE mi_id = #{loginId} and mi_pwd = #{loginPwd}
+    </select>
+    <select id="isDuplicatedId" resultType="java.lang.Boolean">
+        SELECT COUNT(*) FROM member_info WHERE mi_id = #{id}
+    </select>
+    <select id="selectMemberInfoBySeq" resultMap="memberResponseMap">
+        SELECT mi_seq, mi_id, mi_name, mi_phone, mi_status, mi_grade, mi_address
+        FROM member_info
+        WHERE mi_seq = #{memberSeq}
+    </select>
+    <update id="updateMemberInfo">
+        UPDATE member_info
+        SET 
+            mi_name=#{memberName},
+            mi_phone=#{memberPhone},
+            mi_address=#{memberAddress}
+        WHERE mi_seq= #{memberSeq} and mi_pwd = #{memberPwd}
+    </update>
+    <update id="updateMemberPwd">
+        UPDATE member_info
+        SET mi_pwd = #{newPwd}
+        WHERE mi_seq= #{memberSeq} and mi_pwd = #{originPwd}
+    </update>
+</mapper>

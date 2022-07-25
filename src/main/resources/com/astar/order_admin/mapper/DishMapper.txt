@@ -1,0 +1,85 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.astar.order_admin.mapper.DishMapper">
+<resultMap id="restaurantViewResponseMap" type="com.astar.order_admin.data.response.dish.RestaurantViewResponseVO">
+    <id property="restSeq" column="ri_seq"/>
+    <result property="memberSeq" column="ri_mi_seq"/>
+    <result property="restName" column="ri_name"/>
+    <result property="restMinPrice" column="ri_min_price"/>
+    <result property="restDeliveryFee" column="ri_delivery_fee"/>
+    <result property="restAddress" column="ri_address"/>
+    <result property="restOpenTime" column="ri_open_time"/>
+    <result property="restEndTime" column="ri_end_time"/>
+    <result property="restDescription" column="ri_description"/>
+    <result property="cateSeq" column="ri_cate_seq"/>
+    <result property="cateName" column="cate_name"/>
+    <result property="restImgSeq" column="ri_img_seq"/>
+    <result property="restImgFile" column="img_file"/>
+</resultMap>
+<resultMap id="dishViewResponseMap" type="com.astar.order_admin.data.response.dish.DishViewResponseVO">
+    <id property="dishSeq" column="di_seq"/>
+    <result property="restSeq" column="di_ri_seq"/>
+    <result property="dishName" column="di_name"/>
+    <result property="dishPrice" column="di_price"/>
+    <result property="dishDescription" column="di_description"/>
+    <result property="dishImgSeq" column="di_img_seq"/>
+    <result property="dishImgFile" column="dish_img_file"/>
+    <collection property="blockList" javaType="ArrayList" resultMap="optionBlockResponseMap" ofType="com.astar.order_admin.data.response.dish.OptionBlockResponseVO"/>
+</resultMap>
+<resultMap id="optionBlockResponseMap" type="com.astar.order_admin.data.response.dish.OptionBlockResponseVO">
+    <id property="optionSeq" column="opt_seq"/>
+    <result property="optionTitle" column="opt_title"/>
+    <result property="dishSeq" column="opt_di_seq"/>
+    <result property="optionAllowedNo" column="opt_allowed_no"/>
+    <result property="optionRequierd" column="opt_requierd"/>
+    <collection property="descList" javaType="ArrayList" resultMap="optionDescResponseMap" ofType="com.astar.order_admin.data.response.dish.OptionDescResponseVO"/>
+</resultMap>
+<resultMap id="optionDescResponseMap" type="com.astar.order_admin.data.response.dish.OptionDescResponseVO">
+    <id property="descSeq" column="desc_seq"/>
+    <result property="optionSeq" column="desc_opt_seq"/>
+    <result property="descText" column="desc_name"/>
+    <result property="dishPrice" column="desc_price"/>
+</resultMap>
+
+    <select id="selectRestaurantView" resultMap="restaurantViewResponseMap">
+        select * from restaurant_view where ri_seq = #{restSeq} 
+        order by ri_seq asc
+    </select>
+    <select id="selectDishInfoByRestaurant" resultMap="dishViewResponseMap">
+        select * from dish_view where di_ri_seq = #{restSeq}
+        order by di_seq asc
+    </select>
+    <select id="selectOptionBlockInfoByDish" resultMap="optionBlockResponseMap">
+        select * from option_block_info where opt_di_seq = #{dishSeq}
+        order by opt_seq asc
+    </select>
+    <select id="selectOptionDescInfoByBlock" resultMap="optionDescResponseMap">
+        select * from option_description_info where desc_opt_seq = #{optionSeq}
+        order by desc_seq asc
+    </select>
+
+    <insert id="insertDishInfoByRestaurant"
+        parameterType="com.astar.order_admin.data.request.dish.DishRequestVO"
+        useGeneratedKeys="true" keyProperty="di_seq">
+        INSERT INTO dish_info
+        (di_ri_seq, di_name, di_price, di_img_seq, di_description)
+        VALUES
+        (#{di_ri_seq}, #{di_name}, #{di_price}, #{di_img_seq}, #{di_description})
+    </insert>
+    <insert id="insertOptionBlockInfoByDish"
+        parameterType="com.astar.order_admin.data.request.dish.DishRequestVO"
+        useGeneratedKeys="true" keyProperty="opt_seq">
+        INSERT INTO option_block_info
+        (opt_title, opt_di_seq, opt_allowed_no, opt_requierd)
+        VALUES
+        (#{opt_title}, #{opt_di_seq}, #{opt_allowed_no}, #{opt_requierd})
+    </insert>
+    <insert id="insertOptionDescByBlock">
+        INSERT INTO option_description_info
+        (desc_name, desc_price, desc_opt_seq)
+        VALUES
+        (#{desc_name}, #{desc_price}, #{desc_opt_seq})
+    </insert>
+
+
+</mapper>

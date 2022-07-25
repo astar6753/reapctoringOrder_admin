@@ -1,0 +1,48 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.astar.order_admin.mapper.ImgMapper">
+<resultMap id="imgResponseMap" type="com.astar.order_admin.data.response.img.ImgResponseVO">
+    <id property="imgSeq" column="img_seq"/>
+    <result property="memberSeq" column="img_mi_seq"/>
+    <result property="imgTypeNO" column="img_type"/>
+    <result property="imgFrontName" column="img_front_name"/>
+    <result property="imgBackName" column="img_back_name"/>
+</resultMap>
+
+    <select id="selectImgInfoBySeq" resultMap="imgResponseMap">
+        SELECT img_seq, img_mi_seq, img_type, img_front_name, img_back_name
+        FROM img_info
+        WHERE img_mi_seq = #{memberSeq} AND img_type = #{typeNo}
+        LIMIT 10 OFFSET #{offset}
+    </select>
+    <insert id="insertImgInfo">
+        INSERT INTO img_info
+        (img_mi_seq, img_type, img_front_name, img_back_name)
+        VALUES
+        (#{memberSeq}, #{imgTypeNo}, #{imgFrontName}, #{imgBackName})
+    </insert>
+    <select id="selectImgBackNameByImgSeq" resultType="java.lang.String">
+        SELECT img_back_name
+        FROM img_info
+        WHERE img_seq = #{imgSeq}
+    </select>
+    <delete id="deleteImgInfoByImgSeq">
+        DELETE FROM img_info
+        WHERE img_seq=#{imgSeq}
+    </delete>
+    <update id="updateRestaurantImg">
+        UPDATE restaurant_info 
+        SET ri_img_seq = #{img_seq}
+        WHERE ri_seq = #{restSeq}
+    </update>
+    <update id="updateDishImg">
+        UPDATE dish_info 
+        SET di_img_seq = #{img_seq}
+        WHERE di_seq = #{dishSeq}
+    </update>
+    <update id="updateMemberImg">
+        UPDATE member_Info 
+        SET mi_img_seq = #{img_seq}
+        WHERE mi_seq = #{memberSeq}
+    </update>
+</mapper>
