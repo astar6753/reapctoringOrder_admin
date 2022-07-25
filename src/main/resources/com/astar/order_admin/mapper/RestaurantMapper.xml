@@ -74,7 +74,7 @@
     </delete>
 
     
-    <select id="selectCategoryList" resultType="categoryResponseVOMap">
+    <select id="selectCategoryList" resultMap="categoryResponseVOMap">
         SELECT cate_seq, cate_name
         FROM category_info
         WHERE cate_name like CONCAT('%',#{keyword},'%')
