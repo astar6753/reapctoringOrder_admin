@@ -36,13 +36,13 @@ public class RestaurantAPIController {
     }
 
     //사업자회원 영엄장 조회
-    @GetMapping("/user/list") 
+    @GetMapping("/list") 
     public ResponseEntity<Map<String,Object>> getUserRestaurant(
         @RequestParam @Nullable Integer page, HttpSession session, @RequestParam @Nullable String keyword
         ) {       
         return new ResponseEntity<Map<String,Object>>(restService.userRestaurant(page, session, keyword),HttpStatus.OK);
     }
-
+    
     //회원 자신의 영업장 정보 수정
     @PatchMapping("/update") 
     public ResponseEntity<Map<String,Object>> updateUserRestaurant(
@@ -52,7 +52,7 @@ public class RestaurantAPIController {
     }
 
     //사업자회원 영엄장 삭제
-    @DeleteMapping("/user/delete") 
+    @DeleteMapping("/delete") 
     public ResponseEntity<Map<String,Object>> deleteUserRestaurant(
         @RequestParam Integer restSeq, HttpSession session
         ) {

@@ -1,0 +1,23 @@
+package com.astar.order_admin.mapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import com.astar.order_admin.data.request.member.MemberRequestVO;
+import com.astar.order_admin.data.request.order.OrderEachRequestVO;
+import com.astar.order_admin.data.request.order.OrderRequestVO;
+import com.astar.order_admin.data.request.order.SelectedOptionRequestVO;
+
+@Mapper
+public interface GeneratorMapper {
+    
+    public void insertMemberInfos(List<MemberRequestVO> users);
+    public List<Integer> selectMemberSeqList();
+    public List<Integer> selectRestaurantSeqList();
+    public List<Integer> selectOrderSeqList();
+    public List<Integer> selectDishSeqList(Integer restSeq);
+    public void insertOrderInfos(List<OrderRequestVO> orderList);
+    public void insertOrderEachInfos(List<OrderEachRequestVO> eachList);
+    public void insertOptionInfos(List<SelectedOptionRequestVO> optionList);
+}

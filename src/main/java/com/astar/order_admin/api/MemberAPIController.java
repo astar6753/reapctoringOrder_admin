@@ -37,7 +37,7 @@ public class MemberAPIController {
     @PostMapping("/login")
     public ResponseEntity<Map<String,Object>> postAdminLogin(
         @RequestBody LoginRequestVO data, HttpSession session) throws Exception {
-        return new ResponseEntity<Map<String,Object>>(memberService.AdminLogin(data, session),HttpStatus.OK);
+        return new ResponseEntity<Map<String,Object>>(memberService.adminLogin(data, session),HttpStatus.OK);
     }
 
     //아이디 중복검사 클릭시

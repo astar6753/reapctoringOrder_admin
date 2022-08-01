@@ -7,13 +7,13 @@
     <meta charset="UTF-8">
     <title>Document</title>
     <script src="/assets/js/manage/restaurant.js"></script>
-    <link rel="stylesheet" href="/assets/css/restaurant.css">
+    <link rel="stylesheet" href="/assets/css/manage/restaurant.css">
 </head>
 <body>
     <main>
         <section class="manage_restaurant">
             <h1>영업장 관리</h1>
-            <button id="open_popup">
+            <button id="open_popup" onclick="set_popup('add')">
                 <i class="fas fa-plus-square"></i><span>영업장 추가</span>
             </button>
             <div class="restaurant_table">
@@ -21,14 +21,14 @@
                     <thead>
                         <tr>
                             <td>번호</td>
+                            <td>로고</td>
                             <td>분류</td>
                             <td>상호명</td>
                             <td>최소주문가격</td>
                             <td>배달료</td>
                             <td>위치</td>
-                            <td>로고</td>
-                            <td></td>
-                            <td></td>
+                            <td>영업시간</td>
+                            <td>설명</td>
                             <td></td>
                             <td></td>
                         </tr>
@@ -38,6 +38,7 @@
                 </table>
             </div>
             <div class="pager_area">
+                
             </div>
         </section>
 
@@ -46,21 +47,23 @@
                 <h1 class="popup_title"></h1>
                 <div class="content">
                     <p>분류</p>
-                        <input type="text" id="cate_name" placeholder="카테고리 검색">
+                        <input type="text" id="cateName" placeholder="카테고리 검색">
                         <div class="search_area">
-                            <select id="cate_list" onchange="changeSelect()">
+                            <select id="cateList" onchange="changeSelect()">
                                 <option value='' selected disabled>카테고리 선택</option>
                             </select>                            
                         </div>
-                    <p>상호명</p><input type="text" id="ri_name">
-                    <p>최소주문가격</p><input type="text" id="ri_min_price">
-                    <p>배달료</p><input type="text" id="ri_delivery_fee">
-                    <p>위치</p><input type="text" id="ri_address">
+                    <p>상호명</p><input type="text" id="restName">
+                    <p>최소주문가격</p><input type="text" id="restMinPrice">
+                    <p>배달료</p><input type="text" id="restDeliveryFee">
+                    <p>위치</p><input type="text" id="restAddress">
+                    <p>영업시간</p><input type="text" id="restOpenTime"><span>~</span><input type="text" id="restEndTime">
+                    <p>설명</p><textarea id="restDescription"></textarea>
                 </div>
                 <div class="btn">
-                    <button id="add_btn" data-seq="${user.mi_seq}">등록</button>
-                    <button id="mod_btn" data-seq="${user.mi_seq}">수정</button>
-                    <button id="cancel">취소</button>
+                    <button id="add_btn" onclick="addRestaurant()">등록</button>
+                    <button id="mod_btn" onclick="editRestaurant()">수정</button>
+                    <button id="cancel" onclick="set_popup()">취소</button>
                 </div>
             </div>
         </section>

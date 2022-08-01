@@ -16,6 +16,6 @@ public class OrderDetailResponseVO {
     private String mi_phone;
     private String ri_name;
     private String ri_address;
-    private Integer total_price;
+    private Integer totalPrice;
     private List<EachOrderVO> eachOrderList;
 }

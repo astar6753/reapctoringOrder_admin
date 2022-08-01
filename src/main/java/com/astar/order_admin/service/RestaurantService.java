@@ -30,7 +30,12 @@ public class RestaurantService {
             resultMap.put("message", "비정상적인 접근입니다.");    
             return resultMap;
         }
-
+        
+        // //현재 세션유저저보 추가
+        Integer userSeq = ((MemberResponseVO)session.getAttribute("user")).getMemberSeq();
+        data.setMemberSeq(userSeq);
+        
+        
         //상호명 중복 검사
         try {
             restMapper.insertRestaurantInfo(data);
@@ -52,7 +57,7 @@ public class RestaurantService {
         //유저로그인/사업자회원여부 검사
         if(!userService.isValidUser(session)){
             resultMap.put("status",false);
-            resultMap.put("message", "비정상적인 접근입니다.");    
+            resultMap.put("message", "비정상적인 접근입니다.");
             return resultMap;
         }
         
@@ -60,7 +65,8 @@ public class RestaurantService {
         Integer userSeq = ((MemberResponseVO)session.getAttribute("user")).getMemberSeq();
         if(page==null) page=1;
         resultMap.put("keyword", keyword);  //검색어 유지를 위해 키워드 반환
-        resultMap.put("restList", restMapper.selectRestaurantViewByUser(userSeq, (page-1)/20, keyword));
+        resultMap.put("currentPage", page); 
+        resultMap.put("restList", restMapper.selectRestaurantViewByUser(userSeq, (page-1)*10, keyword));
         resultMap.put("totalCnt", restMapper.selectRestaurantViewTotalCntByUser(userSeq, keyword));
         resultMap.put("totalPage", restMapper.selectRestaurantViewPageByUser(userSeq, keyword));
         resultMap.put("message", "현재 로그인한 사업자 회원의 영업장 정보입니다.");
@@ -71,25 +77,16 @@ public class RestaurantService {
     public Map<String,Object> modifyRestaurant(RestaurantUpdateRequestVO data, HttpSession session) {
         Map<String,Object> resultMap = new LinkedHashMap<String, Object>();
 
-        //유저로그인/사업자회원여부 검사
+        // 유저로그인/사업자회원여부 검사
         if(!userService.isValidUser(session)){
             resultMap.put("status",false);
             resultMap.put("message","비정상적인 접근입니다.");    
             return resultMap;
         }
-        
-        
+                
         Integer userSeq = ((MemberResponseVO)session.getAttribute("user")).getMemberSeq();
+        data.setMemberSeq(userSeq);
         
-        // --필요여부 view작업 후로 보류--
-        // 세션유저정보와 입력된유저정보 체크
-        // if(userSeq != data.getMeberSeq()){
-        //     resultMap.put("status",false);
-        //     resultMap.put("message","비정상적인 접근입니다.");    
-        //     return resultMap;
-        // }
-
-        data.setMeberSeq(userSeq);
         restMapper.updateRestaurantInfo(data);
         resultMap.put("status", true);
         resultMap.put("message", "선택한 영업장 정보가 수정되었습니다.");
@@ -122,6 +119,7 @@ public class RestaurantService {
 
         resultMap.put("status", true);
         resultMap.put("searchResult",restMapper.selectCategoryList(keyword));
+        resultMap.put("keyword", keyword);
         resultMap.put("message", "카테고리 검색결과입니다.");
 
         return resultMap;

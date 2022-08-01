@@ -15,7 +15,7 @@ main .dish_area .dish_list_wrap .content_left_box {
 }
 
 main .dish_area .dish_list_wrap .content_left_box .dish_img_area .img_box_link .dish_img {
-    width: 150px;
+    width: 150px; height: 150px;
     border-radius: 30%; border: 1px solid #333;
     margin-bottom: 10px;
 }

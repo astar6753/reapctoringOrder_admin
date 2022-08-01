@@ -13,6 +13,7 @@ public class OrderResponseVO {
     private String mi_id;
     private String mi_name;
     private String mi_phone;
+    private String mi_grade;
     private String ri_name;
     private String ri_address;
 }

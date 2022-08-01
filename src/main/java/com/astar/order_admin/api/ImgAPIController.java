@@ -2,10 +2,14 @@ package com.astar.order_admin.api;
 
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,12 +26,28 @@ import org.springframework.web.multipart.MultipartFile;
 import com.astar.order_admin.service.ImgService;
 
 @RestController
-@RequestMapping("/api/user/img")
+@RequestMapping("/api/img")
 public class ImgAPIController {
     @Autowired ImgService imgService;
+    
+    //이미지 파일 불러오기
+    @GetMapping("/{type}/{filename}")
+    public ResponseEntity<Resource> getImage(
+        @PathVariable String type, @PathVariable @Nullable String filename, HttpServletRequest request) {
+            String contentType = (String)imgService.ImgFile(type,filename,request).get("contentType");
+            Resource resource = (Resource)imgService.ImgFile(type,filename,request).get("resource");
+        return
+            ResponseEntity.ok() //결과로 200ok를 설정
+            //파일의 타입을 Spring프레임 워크를 통해 파일 유형을 결정
+            .contentType(MediaType.parseMediaType(contentType))
+            //파일 이름의 표시방법을 설정
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=\""+resource.getFilename()+"\"")
+            //실제 리소스uri를 body에 포함
+            .body(resource);
+    }
 
     //세션의 로그인한 유저가 본인이 등록한 이미지 조회
-    @GetMapping("/{type}/{fileName}")
+    @GetMapping("/user/{type}")
     public ResponseEntity<Map<String,Object>> getImgList(
         HttpSession session, @PathVariable String type, @RequestParam @Nullable Integer offset
         ){
@@ -50,7 +70,7 @@ public class ImgAPIController {
         return new ResponseEntity<Map<String,Object>>(imgService.deleteImgInfoByImgSeq(type,imgSeq),HttpStatus.OK);
     }
 
-    //이미지보관함의 이미지를 영업장/음식/유저 테이블 등록
+    //영업장/음식/유저 테이블에 등록된 이미지 변경
     @PatchMapping("/{type}")
     public ResponseEntity<Map<String,Object>> updateImgInfo(
         @PathVariable String type, @RequestParam Integer imgSeq, @RequestParam Integer seq

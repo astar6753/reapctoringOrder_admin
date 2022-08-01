@@ -12,7 +12,7 @@ public class DishRequestVO {
         private Integer dishPrice;
         private String dishDescription;
         private Integer dishImgSeq;
-        private String dishImgFile;
+        // private String dishImgFile;
         private List<OptionBlockRequestVO> blockList;
 }
 

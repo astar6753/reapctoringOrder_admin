@@ -1,98 +1,41 @@
 let offset = 0;
+
 $(function(){
-    imgView(type,offset);
-    $("#next").click(function(){
-        offset++;
-        imgView(type,offset);
-    })
-    $("#prev").click(function(){
-        if(offset<0) {alert("처음입니다."); return;}
-        offset--;
-        imgView(type,offset);
-        
-    })
     $("#img_file").change(function(){
         let form = $("#img_form");
         let formData = new FormData(form[0]);
         if($(this).val() == ''||$(this).val() == null) return;
         $.ajax({
-            url:"/api/img/"+type+"/upload",
+            url:"/api/img/"+type,
             type:"put",
             data:formData,
             contentType:false,
             processData:false,
             success:function(r) {
                 console.log(r)
-                if(!r.status) {
-                    console.log(r.message);
-                    return;
-                }
-                let data ={
-                    img_front_name: r.originName,
-                    img_back_name: r.saveFileName
-                };
-                $.ajax({
-                    url:"/api/user/img/"+type+"",
-                    type:"put",
-                    contentType:"application/json",
-                    data:JSON.stringify(data),
-                    success:function(r) {
-                        console.log(r.message);
-                        imgView(type,offset);
-                    }
-                })
+                imgView(type,0);
             },
             error:function(error) {
                 console.log(error);
             }
         })
     });
-
 })
-
-function selectImg(img_seq) {
-    $.ajax({
-        url:"/api/user/img/"+type+"?img_seq="+img_seq+"&seq="+seq,
-        type:"patch",
-        success:function(r) {
-            console.log(r.message);
-            location.reload();
-        }
-    })
-}
-function deleteImg(file,seq) {
-    if(!confirm("이미지를 삭제하시겠습니까?"))return;
-    // console.log(seq);
-    $.ajax({
-        url:"/api/img/"+type+"/"+file,
-        type:"delete",
-        success:function(r) {
-            console.log(r.message);
-            $.ajax({
-                url:"/api/user/img/delete?seq="+seq,
-                type:"delete",
-                success:function(r) {
-                    alert(r.message);
-                    imgView(type,offset);
-                }
-            })
-        }
-    })
-}
-function imgView(type,offset){
+function imgView(type,offset,seq){
     $(".img_list").html("");
     $.ajax({
-        url:"/api/user/img/"+type+"?offset="+offset,
+        url:"/api/img/user/"+type+"?offset="+offset,
         type:"get",
         success:function(r) {
-            for(let i = 0; i<r.img_list.length; i++){
+            console.log(r);
+            for(let i = 0; i<r.imgList.length; i++){
                 let tag = 
                 '<div class="img_box">'
-                +'<div class="'+type+'_img" filename="'+r.img_list[i].img_back_name+'" style="background-image:url(/api/img/'+type+'/'+r.img_list[i].img_back_name+')">'
-                            +'<button onclick=selectImg("'+r.img_list[i].img_seq+'")>선택</button>'            
-                            +'<button onclick=deleteImg("'+r.img_list[i].img_back_name+'\","'+r.img_list[i].img_seq+'") data-seq='+r.img_list[i].img_seq+'>&times;</button>'
+                +'<div class="img_file" filename="'+r.imgList[i].imgBackName+'" style="background-image:url(/api/img/'+type+'/'+r.imgList[i].imgBackName+')">'
+                            +'<button onclick=selectImg("'+r.imgList[i].imgSeq+'","'+seq+'")>선택</button>'            
+                            +'<button onclick=deleteImg("'+r.imgList[i].imgSeq+'")>&times;</button>'
                             +'</div>'
-                            +'<p>'+r.img_list[i].img_front_name+'</p>'
+                            +'<p>'+r.imgList[i].imgFrontName+'</p>'
                             +'</div>';
                 $(".img_list").append(tag);
             }
@@ -101,4 +44,50 @@ function imgView(type,offset){
             console.log(error);
         }
     })
+}
+
+function next(){
+    offset++;
+    imgView(type,offset);
+}
+
+function prev(){
+    if(offset<=0){offset=0; alert("처음입니다."); return;}
+    offset--;
+    imgView(type,offset);
+    
+}
+
+function selectImg(imgSeq, seq) {
+    $.ajax({
+        url:"/api/img/"+type+"?imgSeq="+imgSeq+"&seq="+seq,
+        type:"patch",
+        success:function(r) {
+            console.log(r.messege);
+        },
+        error:function(error) {
+            console.log(error);
+        }
+    })
+}
+
+function deleteImg(imgSeq) {
+    if(!confirm("이미지를 삭제하시겠습니까?"))return;
+    $.ajax({
+        url:"/api/img/"+type+"?imgSeq="+imgSeq,
+        type:"delete",
+        success:function(r) {
+            console.log(r.messege);
+            imgView(type,0,seq);
+        },
+        error:function(error) {
+            console.log(error);
+        }
+    })
+}
+
+function closeImgBox(){
+    $(".img_list").html("");
+    $(".img_popup_area").css({"display":"none"});
+    offset = 0;
 }

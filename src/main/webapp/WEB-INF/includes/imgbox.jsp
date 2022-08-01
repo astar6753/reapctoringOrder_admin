@@ -17,10 +17,12 @@
         <div class="imgs">
             <div class="img_list">
             </div>            
-            <button id="prev">prev</button>
-            <button id="next">next</button>
+            <button id="prev" onclick="prev()">prev</button>
+            <button id="next" onclick="next()">next</button>
             <button id="browse" onclick="document.getElementById('img_file').click()">이미지 추가</button>
+            <button id="closeImgBox" onclick="closeImgBox()">닫기</button>
         </div>
+        
     </div>
 </section>
 </main>

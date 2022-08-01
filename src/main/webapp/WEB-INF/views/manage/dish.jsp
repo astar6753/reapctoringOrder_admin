@@ -1,17 +1,14 @@
 <%@page language ="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@include file="/WEB-INF/includes/header.jsp"%>
+<%@include file="/WEB-INF/includes/imgbox.jsp"%>
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <title>Document</title>
     <script src="/assets/js/manage/dish.js"></script>
-    <link rel="stylesheet" href="/assets/css/dish.css">
+    <link rel="stylesheet" href="/assets/css/manage/dish.css">
 </head>
-<!--        // r.key.restaurantInfo 음식점정보 ri_name 음식점이름 / ri_min_price 최소주문가격 / ri_delivery_fee 배달료 / ri_img_seq이미지 / ri_address주소
-            // r.key.dishList[0] 음식점의 메뉴 정보 di_name 메뉴이름/ di_price 기본가격 / di_description 설명 / di_img_seq 이미지
-            // r.key.dishList[0].blockList 메뉴의 옵션블록 정보 opt_title 블록제목 / opt_allowed_no 선택허용개수 / opt_requierd 필수여부
-            // r.key.dishList[0].blockList[0].descList[0] 옵션블록의 옵션정보 desc_name 선택지설명 / desc_price 옵션가격 / desc_opt_seq 옵션 -->
 <body>
     <aside>
         <div class="aside_img">
@@ -45,6 +42,10 @@
                         <span class="sep">~</span>
                         <span class="end_time"></span>
                     </p>
+                </div>
+                <div>
+                    <h3>설명</h3>
+                    <p class="rest_desc"><p>
                 </div>
             </div>
 

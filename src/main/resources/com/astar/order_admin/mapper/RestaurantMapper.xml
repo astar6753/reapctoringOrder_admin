@@ -1,7 +1,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.astar.order_admin.mapper.RestaurantMapper">
-<resultMap id="restaurantViewResponseMap" type="com.astar.order_admin.data.request.restaurant.RestaurantAddRequestVO">
+<resultMap id="RestaurantResponseVOMap" type="com.astar.order_admin.data.response.restaurant.RestaurantResponseVO">
     <id property="restSeq" column="ri_seq"/>
     <result property="memberSeq" column="ri_mi_seq"/>
     <result property="restName" column="ri_name"/>
@@ -13,8 +13,8 @@
     <result property="restDescription" column="ri_description"/>
     <result property="cateSeq" column="ri_cate_seq"/>
     <result property="cateName" column="cate_name"/>
-    <result property="imgSeq" column="ri_img_seq"/>
-    <result property="imgFile" column="img_file"/>
+    <result property="restImgSeq" column="ri_img_seq"/>
+    <result property="restImgFile" column="img_file"/>
 </resultMap>
 <resultMap id="categoryResponseVOMap" type="com.astar.order_admin.data.response.category.CategoryResponseVO">
     <id property="cateSeq" column="cate_seq"/>
@@ -23,11 +23,11 @@
 
     <insert id="insertRestaurantInfo">
         INSERT INTO restaurant_info
-        (ri_mi_seq, ri_name, ri_min_price, ri_delivery_fee, ri_address, ri_cate_seq, ri_open_time, ri_end_time, ri_description)
+        (ri_mi_seq,  ri_cate_seq, ri_name, ri_min_price, ri_delivery_fee, ri_address, ri_open_time, ri_end_time, ri_description)
         VALUES
-        (#{meberSeq}, #{restName}, #{restMinPrice}, #{restDeliveryFee}, #{restAddress}, #{restCateSeq}, #{restOpenTime}, #{restEndTime}, #{restDescription})
+        (#{memberSeq}, #{cateSeq}, #{restName}, #{restMinPrice}, #{restDeliveryFee}, #{restAddress}, #{restOpenTime}, #{restEndTime}, #{restDescription})
     </insert>
-    <select id="selectRestaurantViewByUser" resultMap="restaurantViewResponseMap">
+    <select id="selectRestaurantViewByUser" resultMap="RestaurantResponseVOMap">
         SELECT 
             ri_seq, ri_mi_seq, ri_name, ri_min_price, ri_delivery_fee,
             ri_address, ri_open_time, ri_end_time, ri_description, ri_cate_seq,
@@ -37,7 +37,7 @@
         <if test="keyword != null">
         AND ri_name Like CONCAT('%',#{keyword},'%')
         </if>
-        LIMIT 20 OFFSET #{offset}
+        LIMIT 10 OFFSET #{offset}
     </select>
     <select id="selectRestaurantViewTotalCntByUser" resultType="java.lang.Integer">
         SELECT COUNT(*)
@@ -48,7 +48,7 @@
         </if>
     </select>
     <select id="selectRestaurantViewPageByUser" resultType="java.lang.Integer">
-        SELECT CEIL(COUNT(*)/20)
+        SELECT CEIL(COUNT(*)/10)
         FROM restaurant_view
         WHERE ri_mi_seq = #{memberSeq}
         <if test="keyword != null">
@@ -58,15 +58,15 @@
     <update id="updateRestaurantInfo">
         UPDATE restaurant_info
         SET 
+            ri_cate_seq=#{cateSeq},
             ri_name=#{restName},
             ri_min_price=#{restMinPrice},
             ri_delivery_fee=#{restDeliveryFee},
             ri_address=#{restAddress},
-            ri_cate_seq=#{restCateSeq}
-            ri_open_time=#{restOpenTime}
-            ri_end_time=#{restEndTime}
+            ri_open_time=#{restOpenTime},
+            ri_end_time=#{restEndTime},
             ri_description=#{restDescription}
-        WHERE ri_seq= #{restSeq} AND ri_mi_seq = #{meberSeq}
+        WHERE ri_seq= #{restSeq} AND ri_mi_seq = #{memberSeq}
     </update>
     <delete id="deleteRestaurantInfoBySeq">
         DELETE FROM restaurant_info

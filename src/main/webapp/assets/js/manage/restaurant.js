@@ -1,197 +1,226 @@
-let seq;
+let query = window.location.search;
+let param = new URLSearchParams(query);
+let page = param.get('page');
+if(page==null) page=1;
+
 let type = "restaurant";
+let seq = 0;
+
 
 $(function(){
-    //영업장 추가 버튼
-    $("#open_popup").click(function(){
-        set_popup("add");
-    })
-    $("#cancel").click(function(){  
-        set_popup();
-    })
-    //카테고리 검색
-    $("#cate_name").change(function(){
-        $("#cate_list").html("");
-        $("#cate_name").attr("cate-seq","")
-        let keyword = $("#cate_name").val();
+    $("#cateName").change(function(){
+        $("#cateList").html("");
+        $("#cateName").attr("cate-seq","")
+        let keyword = $("#cateName").val();
         $.ajax({
             url:"/api/restaurant/category?keyword="+keyword,
             type:"get",
             success:function(r) {
-                if(r.cate_search.length==0)return;
-                for (let i = 0; i < r.cate_search.length; i++) {
-                    let tag = "<option id='select_cate"+i+"' value="+r.cate_search[i].cate_seq+">"+r.cate_search[i].cate_name+"</option>";
-                    $("#cate_list").append(tag);
+                console.log(r);
+                if(r.searchResult.length==0)return;
+                for (let i = 0; i < r.searchResult.length; i++) {
+                    let tag = "<option id='select_cate"+i+"' value="+r.searchResult[i].cateSeq+">"+r.searchResult[i].cateName+"</option>";
+                    $("#cateList").append(tag);
                 }
                 changeSelect();
             }
         })
     })
 
-    //창열자마자 테이블 조회
     $.ajax({
-        url:"/api/restaurant/user/list",
+        url:"/api/restaurant/list?page="+page,
         type:"get",
         success:function(r) {
-            console.log(r.message);
-
-            for (let i = 0; i < r.list.length; i++) {
-                if(r.list[i].img_file==null)r.list[i].img_file="default.jpg";
+            // console.log(r);
+            if(r.restList==null){return;}
+            for (let i=0; i<r.restList.length; i++) {
+                if(r.restList[i].restImgFile==null)r.restList[i].restImgFile="default.png";
                 let tag =   "<tr>"+
-                                "<td id='order"+r.list[i].ri_seq+"'>"+(i+1)+"</td>"+
-                                "<td id='cate"+r.list[i].ri_seq+"'>"+r.list[i].cate_name+"</td>"+
-                                "<td id='name"+r.list[i].ri_seq+"'>"+r.list[i].ri_name+"</td>"+
-                                "<td id='price"+r.list[i].ri_seq+"'>"+r.list[i].ri_min_price+"</td>"+
-                                "<td id='fee"+r.list[i].ri_seq+"'>"+r.list[i].ri_delivery_fee+"</td>"+
-                                "<td id='addr"+r.list[i].ri_seq+"'>"+r.list[i].ri_address+"</td>"+
-                                "<td><img class='restaurant_small_img' src='/api/img/"+type+"/"+r.list[i].img_file+"'></td>"+
-                                "<td><button class='img_btn' data-seq="+r.list[i].ri_seq+" name="+r.list[i].ri_name+"><i class='fas fa-edit'></i><span>로고 이미지</span></button></td>"+
-                                "<td><button class='dish_btn'><i class='fas fa-edit'></i><a href='/manage/dish?seq="+r.list[i].ri_seq+"'>메뉴관리</a></button></td>"+
-                                "<td><button class='edit_btn' data-seq="+r.list[i].ri_seq+" cate-seq="+r.list[i].ri_cate_seq+"><i class='fas fa-edit'></i><span>수정</span></button></td>"+
-                                "<td><button class='del_btn' data-seq="+r.list[i].ri_seq+"><i class='fas fa-trash-alt'></i><span>삭제</span></button></td>"+
+                                "<td id='order"+r.restList[i].restSeq+"'>"+(i+1)+"</td>"+
+                                "<td><a href='#' onclick='openImgPopUp("+r.restList[i].restSeq+")'><img class='restaurant_small_img' src='/api/img/"+type+"/"+r.restList[i].restImgFile+"'></a></td>"+
+                                "<td id='cate"+r.restList[i].restSeq+"' cate-seq="+r.restList[i].cateSeq+">"+r.restList[i].cateName+"</td>"+
+                                "<td id='name"+r.restList[i].restSeq+"'>"+r.restList[i].restName+"</td>"+
+                                "<td id='price"+r.restList[i].restSeq+"'>"+r.restList[i].restMinPrice+"</td>"+
+                                "<td id='fee"+r.restList[i].restSeq+"'>"+r.restList[i].restDeliveryFee+"</td>"+
+                                "<td id='addr"+r.restList[i].restSeq+"'>"+r.restList[i].restAddress+"</td>"+
+                                "<td>"+
+                                    "<span id='open"+r.restList[i].restSeq+"'>"+r.restList[i].restOpenTime+"</span>"+
+                                    "<span>~</span>"+
+                                    "<span id='end"+r.restList[i].restSeq+"'>"+r.restList[i].restEndTime+"</span>"+
+                                "</td>"+
+                                "<td id='desc"+r.restList[i].restSeq+"'>"+r.restList[i].restDescription+"</td>"+
+                                "<td><button class='dish_btn'><i class='fas fa-edit'></i><a href='/manage/dish?seq="+r.restList[i].restSeq+"'>메뉴관리</a></button></td>"+
+                                "<td><button class='edit_btn' onclick='set_popup("+r.restList[i].restSeq+")'><i class='fas fa-edit'></i><span>수정</span></button></td>"+
+                                "<td><button class='del_btn' onclick='deleteRestaurant("+r.restList[i].restSeq+")'><i class='fas fa-trash-alt'></i><span>삭제</span></button></td>"+
                             "</tr>";
                 $("#restaurant_list").append(tag);
             }
-            $(".img_btn").click(function(){
-                $(".img_popup_area").show();
-                seq = $(this).attr("data-seq");
-                $(".name").html($(this).attr("name"));
-            })
 
-            $(".del_btn").click(function(){
-                let seq = $(this).attr("data-seq");
-                if(!confirm("영업장 정보를 삭제하시겠습니까?\n삭제된 정보는 되돌릴 수 없습니다.")) return;
-                $.ajax({
-                    url:"/api/restaurant/delete?seq="+seq,
-                    type:"delete",
-                    success:function(r) {
-                        alert(r.message);
-                        location.reload();
-                    },
-                    error:function(err){
-                        alert(err.responseText);
-                        location.href="/member/login"
-                    }
-                })
-            })
-            $(".edit_btn").click(function(){
-                set_popup("edit");
-                let seq = $(this).attr("data-seq"); //버튼 생성시 세팅된 영업장seq
-                $("#cate_name").val($("#cate"+seq+"").html());
-                let cate_seq = $("#cate_name").attr("cate-seq",$(this).attr("cate-seq"));
-                $("#ri_name").val($("#name"+seq+"").html());
-                $("#ri_min_price").val($("#price"+seq+"").html());
-                $("#ri_delivery_fee").val($("#fee"+seq+"").html());
-                $("#ri_address").val($("#addr"+seq+"").html());
-
-                $("#mod_btn").click(function(){
-                    if(valid_chk())return;
-                    let data = {
-                        ri_seq: seq,
-                        ri_cate_seq: cate_seq,
-                        ri_name: $("#ri_name").val(),
-                        ri_min_price: $("#ri_min_price").val(),
-                        ri_delivery_fee: $("#ri_delivery_fee").val(),
-                        ri_address: $("#ri_address").val()
-                    };
-                    $.ajax({
-                        url:"/api/restaurant/update",
-                        type:"patch",
-                        contentType:"application/json",
-                        data:JSON.stringify(data),
-                        success:function(r) {
-                            alert(r.message);
-                            location.reload();
-                        },
-                        error:function(err){
-                            alert(err.responseText);
-                            location.href="/member/login"
-                        }
-                    })
-                })
-            })
+            for(let i=0; i<r.totalPage;i++){
+                let pager = '<a href="http://localhost:8888/manage/restaurant?page='+(i+1)+'">'+(i+1)+'</a>';
+                $(".pager_area").append(pager);
+            }
         },
         error:function(err){
-            alert(err.responseText);
+            console.log(err);
             location.href="/member/login"
         }
     })
-
-    $("#add_btn").click(function(){
-        if(valid_chk())return;
-        let data = {
-            ri_mi_seq:$(this).attr("data-seq"), //jsp에서 세션의 유저seq를 버튼에 등록해둠
-            ri_cate_seq: $("#cate_list option:selected").val(),
-            ri_name: $("#ri_name").val(),
-            ri_min_price: $("#ri_min_price").val(),
-            ri_delivery_fee: $("#ri_delivery_fee").val(),
-            ri_address: $("#ri_address").val()
-        }
-        $.ajax({
-            url:"/api/restaurant/insert",
-            type:"put",
-            contentType:"application/json",
-            data:JSON.stringify(data),
-            success:function(r) {
-                alert(r.message);
-                location.reload();
-            },
-            error:function(err){
-                alert(err.responseText);
-                location.href="/member/login"
-            }
-        })
-    })
 })
+
+function addRestaurant(){
+    if(valid_chk())return;
+    let data = {
+        memberSeq:"",
+        cateSeq: $("#cateName").attr("cate-seq"),
+        restName: $("#restName").val(),
+        restMinPrice: $("#restMinPrice").val(),
+        restDeliveryFee: $("#restDeliveryFee").val(),
+        restAddress: $("#restAddress").val(),
+        restOpenTime: $("#restOpenTime").val(),
+        restEndTime: $("#restEndTime").val(),
+        restDescription: $("#restDescription").val()
+    }
+    $.ajax({
+        url:"/api/restaurant/insert",
+        type:"put",
+        contentType:"application/json",
+        data:JSON.stringify(data),
+        success:function(r) {
+            alert(r.message);
+            location.reload();
+        },
+        error:function(err){
+            console.log(err);
+            location.href="/member/login"
+        }
+    })
+}
+function deleteRestaurant(restSeq){
+    if(!confirm("영업장 정보를 삭제하시겠습니까?\n삭제된 정보는 되돌릴 수 없습니다.")) return;
+    $.ajax({
+        url:"/api/restaurant/delete?restSeq="+restSeq,
+        type:"delete",
+        success:function(r) {
+            alert(r.message);
+            location.reload();
+        },
+        error:function(err){
+            alert(err);
+            location.href="/member/login"
+        }
+    })
+}
+function editRestaurant(){
+    if(valid_chk())return;
+    let data = {
+        restSeq: $("#restName").attr("rest-seq"),
+        memberSeq:"",
+        cateSeq: $("#cateName").attr("cate-seq"),
+        restName: $("#restName").val(),
+        restMinPrice: $("#restMinPrice").val(),
+        restDeliveryFee: $("#restDeliveryFee").val(),
+        restAddress: $("#restAddress").val(),
+        restOpenTime: $("#restOpenTime").val(),
+        restEndTime: $("#restEndTime").val(),
+        restDescription: $("#restDescription").val()
+    }
+    $.ajax({
+        url:"/api/restaurant/update",
+        type:"patch",
+        contentType:"application/json",
+        data:JSON.stringify(data),
+        success:function(r) {
+            alert(r.message);
+            location.reload();
+        },
+        error:function(err){
+            console.log(err);
+            location.href="/member/login"
+        }
+    })
+}
+
+function openImgPopUp(restSeq){
+    $(".img_popup_area").css({"display":"block"});
+    seq = restSeq;
+    
+    imgView(type,0,seq);
+}
+
 
 function set_popup(mode){
     $(".popup_area").hide();
-    $("#cate_name").attr("cate-seq","");
-    $("#cate_list").html("")    
+    $("#cateName").attr("cate-seq","");
+    $("#cateList").html("")
     let tag = "<option value='' selected disabled>카테고리 선택</option>"
-    $("#cate_list").append(tag)
-    $("#cate_list option:eq(0)").html("카테고리 검색")
-    $("#cate_name").val("")
-    $("#ri_name").val("")
-    $("#ri_min_price").val("")
-    $("#ri_delivery_fee").val("")
-    $("#ri_address").val("")
+    $("#cateList").append(tag)
+    $("#cateList option:eq(0)").html("카테고리 검색")
+    $("#cateName").val("")
+    $("#restName").val("")
+    $("#restMinPrice").val("")
+    $("#restDeliveryFee").val("")
+    $("#restAddress").val("")
+    $("#restOpenTime").val("")
+    $("#restEndTime").val("")
+    $("#restDescription").val("");
     if(mode=="add"){
         $(".popup_title").html("영업장 등록")
         $("#mod_btn").hide();
         $("#add_btn").show();
         $(".popup_area").show();
+        return;
     }
-    else if(mode=="edit"){
+    else if(mode!=null){
+        $("#mod_btn").attr("rest-seq",mode)
         $(".popup_title").html("영업장 정보 수정")
         $("#add_btn").hide();
         $("#mod_btn").show();
         $(".popup_area").show();
+
+        $("#cateName").val($("#cate"+mode+"").html());
+        $("#cateName").attr("cate-seq",$("#cate"+mode+"").attr("cate-seq"));
+        $("#restName").attr("rest-seq",mode);
+        $("#restName").val($("#name"+mode+"").html());
+        $("#restMinPrice").val($("#price"+mode+"").html());
+        $("#restDeliveryFee").val($("#fee"+mode+"").html());
+        $("#restAddress").val($("#addr"+mode+"").html());
+        $("#restOpenTime").val($("#open"+mode+"").html());
+        $("#restEndTime").val($("#end"+mode+"").html());
+        $("#restDescription").val($("#desc"+mode+"").html());
     }
 }
 function valid_chk(){    
-    if(isEmpty($("#cate_list option:selected").val(),false)) {
+    if(isEmpty($("#cateName").val(),false)) {
         alert("카테고리 이름을 입력하세요");
         return false;
     }
-    if(isEmpty($("#ri_name").val(),false)) {
+    if(isEmpty($("#restName").val(),false)) {
         alert("영업장 이름을 입력하세요");
         return false;
     }
-    if(isEmpty($("#ri_min_price").val(),false)) {
+    if(isEmpty($("#restMinPrice").val(),false)) {
         alert("최소주문가격을 입력하세요");
         return false;
     }
-    if(isEmpty($("#ri_delivery_fee").val(),false)) {
+    if(isEmpty($("#restDeliveryFee").val(),false)) {
         alert("배달료를 입력하세요");
         return false;
     }
-    if(isEmpty($("#ri_address").val(),false)) {
-        alert("배달료를 입력하세요");
+    if(isEmpty($("#restAddress").val(),false)) {
+        alert("주소를 입력하세요");
+        return false;
+    }
+    if(isEmpty($("#restOpenTime").val(),false)) {
+        alert("영업시간을 입력하세요");
+        return false;
+    }
+    if(isEmpty($("#restEndTime").val(),false)) {
+        alert("영업시간을 입력하세요");
         return false;
     }
 }
 function changeSelect(){
-    $("#cate_name").val($("#cate_list option:selected").text());
-    $("#cate_name").attr("cate-seq",$("#cate_list option:selected").val());
+    $("#cateName").val($("#cateList option:selected").text());
+    $("#cateName").attr("cate-seq",$("#cateList option:selected").val());
 }

@@ -6,62 +6,95 @@
     <meta charset="UTF-8">
     <title>Document</title>
     <script src="/assets/js/member/info.js"></script>
+    <link rel="stylesheet" href="/assets/css/member/info.css">
 </head>
 <body>
     <main>
-        <h1>회원정보 수정</h1>
-        <div class="member_info_box">
-            <div class="input_area">
+        <h1 class="title">회원정보</h1>
+        <div class="memberInfoBox">
+            <div class="memberinfoArea">
                 <table>
                     <tbody>
                         <tr>
-                            <td>기존 비밀번호</td>
-                            <td>
-                                <input type="password" id="origin_pwd" placeholder="기존 비밀번호 (16자 이내)">
-                            </td>
-                            <td class="msg_box">
-                                <p id="pwd_not_valid"></p>
-                            </td>
+                            <td class="">ID</td>
+                            <td class="memberId">ID</td>
                         </tr>
                         <tr>
-                            <td>변경할 비밀번호</td>
-                            <td>
-                                <input type="password" id="mi_pwd" placeholder="변경할 비밀번호 (16자 이내)">
-                            </td>
-                            <td class="msg_box">
-                                <p id="pwd_not_confirm"></p>
-                            </td>
+                            <td class="">이름</td>
+                            <td class="memberName">이름</td>
                         </tr>
                         <tr>
-                            <td>비밀번호 확인</td>
-                            <td>
-                                <input type="password" id="mi_pwd_confirm" placeholder="비밀번호 확인">
-                            </td>
+                            <td class="">전화번호</td>
+                            <td class="memberAddress">전화번호</td>
                         </tr>
+                        <tr>
+                            <td class="">주소</td>
+                            <td class="memberPhone">주소</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modifyInfoArea">
+                <table>
+                    <tbody>
                         <tr>
                             <td>이름</td>
                             <td>
-                                <input type="text" id="mi_name" placeholder="이름 (50자 이내)" autocomplete="off">
+                                <input type="text" id="modifyName" placeholder="이름 (50자 이내)" autocomplete="off">
                             </td>
                         </tr>
                         <tr>
                             <td>전화번호</td>
                             <td>
-                                <input type="text" id="mi_phone" placeholder="- 을 빼고 입력하세요." autocomplete="off">
+                                <input type="text" id="modifyPhone" placeholder="- 을 빼고 입력하세요." autocomplete="off">
                             </td>
                         </tr>
                         <tr>
                             <td>주소</td>
                             <td>
-                                <textarea name="" id="mi_address" cols="21" rows="3"></textarea>
+                                <textarea name="" id="modifyAddress" cols="21" rows="3"></textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>비밀번호</td>
+                            <td>
+                                <input type="password" id="modifyPwd" placeholder="비밀번호 입력">
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
+            <div class="modifyPwdArea">
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>기존 비밀번호</td>
+                            <td>
+                                <input type="password" id="originPwd" placeholder="기존 비밀번호 (16자 이내)">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>변경할 비밀번호</td>
+                            <td>
+                                <input type="password" id="newPwd" placeholder="변경할 비밀번호 (16자 이내)">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>비밀번호 확인</td>
+                            <td>
+                                <input type="password" id="pwd_confirm" placeholder="비밀번호 확인">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
             <div class="btn">
-                <button id="modify">회원정보 수정</button>
-                <button id="cancel">돌아가기</button>
+                <a href="#" id="modInfoOpen" onclick="modifyInfoOpen()">회원정보 수정하기</a>                
+                <button id="modifyInfoBtn" onclick="modifyInfo()">회원정보 수정</button>
+                <a href="#" id="modPwdOpen" onclick="modifyPwdOpen()">비밀번호 변경하기</a>
+                <button id="modifyPwdBtn" onclick="modifyPwd()">비밀번호 변경</button>
+                <button id="cancel" onclick="cancel()">취소</button>
             </div>
         </div>
     </main>

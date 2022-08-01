@@ -17,14 +17,15 @@ public class ManageController {
         return "/manage/customer";
     }
     @GetMapping("/restaurant")  //영업장 관리
-    public String getManageRestaurant() {
+    public String getManageRestaurant(@RequestParam @Nullable Integer page) {
+        if(page==null||page<0) page=0;
         return "/manage/restaurant";
     }
     @GetMapping("/order")  //주문 관리
     public String getManageOrder() {
         return "/manage/order";
     }    
-    @GetMapping("/dish")  //주문 관리
+    @GetMapping("/dish")  //메뉴 관리
     public String getManageDish(@RequestParam @Nullable Integer seq) {
         return "/manage/dish";
     }

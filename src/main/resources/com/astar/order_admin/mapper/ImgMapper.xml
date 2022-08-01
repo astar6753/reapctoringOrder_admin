@@ -4,7 +4,7 @@
 <resultMap id="imgResponseMap" type="com.astar.order_admin.data.response.img.ImgResponseVO">
     <id property="imgSeq" column="img_seq"/>
     <result property="memberSeq" column="img_mi_seq"/>
-    <result property="imgTypeNO" column="img_type"/>
+    <result property="imgTypeNo" column="img_type"/>
     <result property="imgFrontName" column="img_front_name"/>
     <result property="imgBackName" column="img_back_name"/>
 </resultMap>
@@ -32,17 +32,17 @@
     </delete>
     <update id="updateRestaurantImg">
         UPDATE restaurant_info 
-        SET ri_img_seq = #{img_seq}
+        SET ri_img_seq = #{imgSeq}
         WHERE ri_seq = #{restSeq}
     </update>
     <update id="updateDishImg">
         UPDATE dish_info 
-        SET di_img_seq = #{img_seq}
+        SET di_img_seq = #{imgSeq}
         WHERE di_seq = #{dishSeq}
     </update>
     <update id="updateMemberImg">
         UPDATE member_Info 
-        SET mi_img_seq = #{img_seq}
+        SET mi_img_seq = #{imgSeq}
         WHERE mi_seq = #{memberSeq}
     </update>
 </mapper>

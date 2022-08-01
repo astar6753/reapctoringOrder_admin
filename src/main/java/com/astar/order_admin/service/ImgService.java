@@ -11,10 +11,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,6 +40,34 @@ public class ImgService {
         return typeNo;
     }
 
+    //이미지 파일 불러오기
+    public Map<String,Object> ImgFile(String type, String filename, HttpServletRequest request){
+        Map<String,Object> resultMap = new LinkedHashMap<String, Object>();
+        
+        Path folderLocation = Paths.get(path+"/"+type);     // folderLocation = /path/{type}
+        Path filePath = folderLocation.resolve(filename);   // filePath = path/type/filename = d:/order/member/default.jpg
+        Resource resource = null;
+        try {
+            resource = new UrlResource(filePath.toUri());
+        } catch (Exception e) {
+            resultMap.put("status", false);
+            resultMap.put("message","파일을 찾을 수 없거나 잘못된 파일 경로 입니다.");
+        }
+        //파일의 실제 경로에 찾아가서 파일의 유형을 가져온다.
+        String contentType = null;
+        try {
+            request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());            
+            if(contentType == null)
+            contentType = "application/octet-stream";
+        } catch (Exception e) {
+            resultMap.put("status", false);
+            resultMap.put("message","파일을 찾을 수 없거나 잘못된 파일 경로 입니다.");
+        }
+        resultMap.put("contentType", contentType);
+        resultMap.put("resource", resource);
+        return resultMap;
+    }
+
     //세션의 로그인한 유저가 본인이 등록한 이미지 조회
     public Map<String,Object> ImgList(HttpSession session, String type, Integer offset){
         Map<String,Object> resultMap = new LinkedHashMap<String, Object>();
@@ -51,7 +82,7 @@ public class ImgService {
         resultMap.put("imgList", imgList);
         return resultMap;
     }
-    
+
     //유저 이미지보관함 파일업로드 및 디비등록
     public Map<String,Object> ImgInfo(HttpSession session, String type, MultipartFile file){
         Map<String,Object> resultMap = new LinkedHashMap<String, Object>();
@@ -68,12 +99,12 @@ public class ImgService {
             resultMap.put("message","이미지 파일 확장자는 jpg, png, gif만 허용합니다.");
             return resultMap;
         }
-        
+
         Calendar c = Calendar.getInstance();
         //파일 저장시 "타입_타입스탬프.ext"형식으로 저장
         String imgBackName = StringUtils.cleanPath(type+"_"+c.getTimeInMillis()+"."+ext);
         Path target = folderLocation.resolve(imgBackName);
-        
+
         try {
             //파일업로드    //option 이미 존재하면 덮어쓰기
             Files.copy(file.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
@@ -83,7 +114,7 @@ public class ImgService {
             resultMap.put("message",e.getMessage());
             return resultMap;
         }
-        
+
         Integer memberSeq = ((MemberResponseVO)session.getAttribute("user")).getMemberSeq();
         Integer typeNo = imgTypeToNumber(type);
         long fileSize = file.getSize();

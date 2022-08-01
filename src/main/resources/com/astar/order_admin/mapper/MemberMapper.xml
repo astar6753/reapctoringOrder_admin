@@ -14,7 +14,7 @@
 
     <insert id="insertMemberInfo"
         parameterType="com.astar.order_admin.data.request.member.MemberRequestVO"
-        useGeneratedKeys="true" keyProperty="mi_seq">
+        useGeneratedKeys="true" keyProperty="memberSeq">
         INSERT INTO member_info
         (mi_id, mi_pwd, mi_name, mi_phone, mi_grade, mi_address)
         VALUES

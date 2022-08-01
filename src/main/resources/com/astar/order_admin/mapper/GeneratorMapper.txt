@@ -1,0 +1,65 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.astar.order_admin.mapper.MemberMapper">
+<resultMap id="memberResponseMap" type="com.astar.order_admin.data.response.member.MemberResponseVO">
+    <id property="memberSeq" column="mi_seq"/>
+    <result property="memberId" column="mi_id"/>
+    <result property="memberName" column="mi_name"/>
+    <result property="memberPhone" column="mi_phone"/>
+    <result property="memberAddress" column="mi_address"/>
+    <result property="memberStatus" column="mi_status"/>
+    <result property="memberGrade" column="mi_grade"/>
+    <result property="imgSeq" column="mi_img_seq"/>
+</resultMap>
+
+    <insert id="insertMemberInfos">
+        INSERT INTO member_info
+        (mi_id, mi_pwd, mi_name, mi_phone, mi_grade, mi_address)
+        VALUES
+        <foreach collection="users" item="user" separator=",">
+        (#{user.memberId}, #{user.memberPwd}, #{user.memberName}, #{user.memberPhone}, 3, #{user.memberAddress})
+        </foreach>
+    </insert>
+    </insert>
+    <select id="selectMemberSeqList" resultType="java.lang.Integer">
+        SELECT mi_seq FROM member_info
+    </select>
+    <select id="selectRestaurantSeqList" resultType="java.lang.Integer">
+        SELECT ri_seq FROM restaurant_info
+    </select>
+    <select id="selectOrderSeqList" resultType="java.lang.Integer">
+        SELECT oi_seq FROM order_info
+        WHERE oi_status =1
+    </select>
+    <select id="selectDishSeqList" resultType="java.lang.Integer">
+        SELECT di_seq FROM dish_infos
+        WHERE di_ri_seq = #{restSeq}
+    </select>
+
+    
+    <insert id="insertOrderInfos">
+        INSERT INTO order_info
+        (oi_mi_seq, oi_ri_seq, oi_status, oi_address)
+        VALUES
+        <foreach collection="orderList" item="order" separator=",">
+        (#{order.oi_mi_seq}, #{order.oi_ri_seq}, #{order.oi_status}, #{order.oi_address})
+        </foreach>
+    </insert>
+    <insert id="insertOrderEachInfos">
+        INSERT INTO order_each_info
+        (each_oi_seq, each_di_seq, each_quantity)
+        VALUES
+        <foreach collection="eachList" item="each" separator=",">
+        (#{each.each_oi_seq}, #{each.each_di_seq}, #{each.each_quantity})
+        </foreach>
+    </insert>
+    <insert id="insertOptionInfos">
+        INSERT INTO order_selected_option_info
+        (sel_each_seq, sel_desc_seq)
+        VALUES
+        <foreach collection="optionList" item="option" separator=",">
+        (#{option.sel_each_seq}, #{option.sel_desc_seq})
+        </foreach>
+    </insert>
+
+</mapper>

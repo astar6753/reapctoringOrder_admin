@@ -26,11 +26,11 @@ import com.astar.order_admin.mapper.DishMapper;
 
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/dish")
 public class DishAPIController {
     @Autowired DishMapper dishMapper;
     
-    @GetMapping("/dish/list/all") 
+    @GetMapping("/list") 
     public Map<String,Object> getManageDishView(@RequestParam Integer restSeq){
         Map<String,Object> resultMap = new LinkedHashMap<String, Object>();
 
@@ -60,7 +60,7 @@ public class DishAPIController {
             for(OptionBlockResponseVO temp2 : blockList){
                 
                 //4티어정보 리스트 생성 및 옮겨담기
-                List<OptionDescResponseVO> descList = dishMapper.selectOptionDescInfoByBlock(temp2.getDishSeq());
+                List<OptionDescResponseVO> descList = dishMapper.selectOptionDescInfoByBlock(temp2.getOptionSeq());
                 temp2.setDescList(descList);
 
                 //3티어 정보 가져와서 result리스트에 추가                
@@ -74,12 +74,12 @@ public class DishAPIController {
         }
 
         // System.out.println(resultData);
-        resultMap.put("key", resultData);
+        resultMap.put("resultData", resultData);
         return resultMap;
     }
 
     
-    @PostMapping("/dish/list/all") 
+    @PostMapping("/insert") 
     public Map<String,Object> postManageDishView(@RequestBody DishRequestVO data){
         Map<String,Object> resultMap = new LinkedHashMap<String, Object>();
             

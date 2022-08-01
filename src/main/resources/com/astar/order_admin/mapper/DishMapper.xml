@@ -60,25 +60,25 @@
 
     <insert id="insertDishInfoByRestaurant"
         parameterType="com.astar.order_admin.data.request.dish.DishRequestVO"
-        useGeneratedKeys="true" keyProperty="di_seq">
+        useGeneratedKeys="true" keyProperty="dishSeq">
         INSERT INTO dish_info
         (di_ri_seq, di_name, di_price, di_img_seq, di_description)
         VALUES
-        (#{di_ri_seq}, #{di_name}, #{di_price}, #{di_img_seq}, #{di_description})
+        (#{restSeq}, #{dishName}, #{dishPrice}, #{dishImgSeq}, #{dishDescription})
     </insert>
     <insert id="insertOptionBlockInfoByDish"
         parameterType="com.astar.order_admin.data.request.dish.DishRequestVO"
-        useGeneratedKeys="true" keyProperty="opt_seq">
+        useGeneratedKeys="true" keyProperty="optionSeq">
         INSERT INTO option_block_info
         (opt_title, opt_di_seq, opt_allowed_no, opt_requierd)
         VALUES
-        (#{opt_title}, #{opt_di_seq}, #{opt_allowed_no}, #{opt_requierd})
+        (#{optionTitle}, #{dishSeq}, #{optionAllowedNo}, #{optionRequierd})
     </insert>
     <insert id="insertOptionDescByBlock">
         INSERT INTO option_description_info
         (desc_name, desc_price, desc_opt_seq)
         VALUES
-        (#{desc_name}, #{desc_price}, #{desc_opt_seq})
+        (#{descText}, #{dishPrice}, #{optionSeq})
     </insert>
 
 

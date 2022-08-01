@@ -5,8 +5,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Document</title>
-    <script src="/assets/js/manage/restaurant.js"></script>
-    <link rel="stylesheet" href="/assets/css/restaurant.css">
 </head>
 <body>
     <main>

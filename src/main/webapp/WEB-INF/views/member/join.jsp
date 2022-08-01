@@ -17,7 +17,7 @@
                         <tr>
                             <td>아이디</td>
                             <td>
-                                <input type="text" id="mi_id" placeholder="아이디 (16자 이내)" autocomplete="off">
+                                <input type="text" id="joinId" placeholder="아이디 (16자 이내)" autocomplete="off">
                             </td>
                             <td>
                                 <button id="id_dup_chk">중복체크</button>
@@ -29,7 +29,7 @@
                         <tr>
                             <td>비밀번호</td>
                             <td>
-                                <input type="password" id="mi_pwd" placeholder="비밀번호 (16자 이내)">
+                                <input type="password" id="joinPwd" placeholder="비밀번호 (16자 이내)">
                             </td>
                             <td class="msg_box">
                                 <p id="pwd_not_confirm"></p>
@@ -38,33 +38,33 @@
                         <tr>
                             <td>비밀번호 확인</td>
                             <td>
-                                <input type="password" id="mi_pwd_confirm" placeholder="비밀번호 확인">
+                                <input type="password" id="joinPwd_confirm" placeholder="비밀번호 확인">
                             </td>
                         </tr>
                         <tr>
                             <td>이름</td>
                             <td>
-                                <input type="text" id="mi_name" placeholder="이름 (50자 이내)" autocomplete="off">
+                                <input type="text" id="joinName" placeholder="이름 (50자 이내)" autocomplete="off">
                             </td>
                         </tr>
                         <tr>
                             <td>전화번호</td>
                             <td>
-                                <input type="text" id="mi_phone" placeholder="- 을 빼고 입력하세요." autocomplete="off">
+                                <input type="text" id="joinPhone" placeholder="- 을 빼고 입력하세요." autocomplete="off">
                             </td>
                         </tr>
                         <tr>
                             <td>주소</td>
                             <td>
-                                <textarea name="" id="mi_address" cols="21" rows="3"></textarea>
+                                <textarea name="" id="joinAddress" cols="21" rows="3"></textarea>
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
             <div class="btn">
-                <button id="join">회원가입</button>
-                <button id="cancel">돌아가기</button>
+                <button id="join" onclick="memberJoin()">회원가입</button>
+                <button id="cancel" onclick="cancel()">돌아가기</button>
             </div>
         </div>
     </main>

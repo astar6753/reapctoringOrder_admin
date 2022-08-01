@@ -32,7 +32,7 @@ public class MemberService {
             resultMap.put("status",false);
             resultMap.put("message",data.getMemberId()+"은(는) 이미 등록된 아이디입니다.");
             return resultMap;
-        }
+        }        
         
         resultMap.put("status",true);
         resultMap.put("message","회원 정보를 추가했습니다.");
@@ -44,21 +44,18 @@ public class MemberService {
     }
     
     //로그인
-    public Map<String,Object> AdminLogin(LoginRequestVO data, HttpSession session)  throws Exception {
+    public Map<String,Object> adminLogin(LoginRequestVO data, HttpSession session)  throws Exception {
         Map<String,Object> resultMap = new LinkedHashMap<String, Object>();
          //사용자로부터 입력받은 비밀번호 정보를 암호화하고 db에서 일치정보 꺼내오기
         data.setLoginPwd(AESAlgorithm.Encrypt(data.getLoginPwd()));
-        System.out.println("data:"+data);
         MemberResponseVO user = memberMapper.selectMemberLogin(data);
-        System.out.println("user:"+user);
         //사용자로부터 입력받은 id pwd로부터 회원정보가 null일 경우(일치값없음) = 아이디/비밀번호 오류
         if(user==null){
             resultMap.put("status", false);
             resultMap.put("message", "아이디 혹은 비밀번호 오류입니다.");
             return resultMap;
         }
-        // MemberGrade=1은 일반회원 2사업자회원
-        else if(user.getMemberGrade()==1){
+        else if(user.getMemberGrade()>2){
             resultMap.put("status", false);
             resultMap.put("message", "사업자 회원만 이용가능한 서비스입니다.");
             return resultMap;
@@ -73,7 +70,7 @@ public class MemberService {
     //아이디 중복검사
     public Map<String,Object> duplicatedIdChk(String id) {
         Map<String,Object> resultMap = new LinkedHashMap<String, Object>();
-        if(!memberMapper.isDuplicatedId(id)){
+        if(memberMapper.isDuplicatedId(id)){
             resultMap.put("status", false);
             resultMap.put("message", "이미 사용중인 ID입니다.");
             return resultMap;
@@ -96,7 +93,7 @@ public class MemberService {
         }        
         resultMap.put("status",true);
         resultMap.put("message", "현재 로그인한 회원의 회원정보입니다.");
-        resultMap.put("member_info",memberMapper.selectMemberInfoBySeq(user.getMemberSeq()));
+        resultMap.put("memberInfo",memberMapper.selectMemberInfoBySeq(user.getMemberSeq()));
         return resultMap;
     }
 
@@ -111,10 +108,8 @@ public class MemberService {
             resultMap.put("message", "정상적인 접근 경로가 아닙니다.");
             return resultMap;
         }
-        
-        //현재 세션의 유저번호를 데이터에 삽입 (view에서 변조방지)
         data.setMemberSeq(user.getMemberSeq());
-
+        
         //사용자로부터 받은 데이터에서 pwd를 암호화
         data.setMemberPwd(AESAlgorithm.Encrypt(data.getMemberPwd()));
         
@@ -139,6 +134,7 @@ public class MemberService {
             return resultMap;
         }
         data.setMemberSeq(user.getMemberSeq());
+        
 
         //사용자로부터 받은 데이터에서 pwd를 암호화
         data.setOriginPwd(AESAlgorithm.Encrypt(data.getOriginPwd()));

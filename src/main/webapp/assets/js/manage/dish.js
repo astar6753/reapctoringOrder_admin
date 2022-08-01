@@ -1,66 +1,74 @@
 let query = window.location.search;
 let param = new URLSearchParams(query);
-let seq = param.get('seq');
+let restSeq = param.get('seq');
+
+let seq = 0;
+let type = "dish";
 
 
 
 $(function(){
     $.ajax({
-        url:"/api/dish/list/all?seq="+seq,
+        url:"/api/dish/list?restSeq="+restSeq,
         type:"get",
         success:function(r) {
-            // console.log(r.key.restaurantView); 음식점정보 ri_name 음식점이름 / ri_min_price 최소주문가격 / ri_delivery_fee 배달료 / ri_img_seq이미지 / ri_address주소
-            // console.log(r.key.dishList[0]); 음식점의 메뉴 정보 di_name 메뉴이름/ di_price 기본가격 / di_description 설명 / di_img_seq 이미지
-            // console.log(r.key.dishList[0].blockList); 메뉴의 옵션블록 정보 opt_title 블록제목 / opt_allowed_no 선택허용개수 / opt_requierd 필수여부
-            // console.log(r.key.dishList[0].blockList[0].descList[0]); 옵션블록의 옵션정보 desc_name 선택지설명 / desc_price 옵션가격 / desc_opt_seq 옵션
+            console.log(r);
             
             //aside정보 
-            $(".restaurant_img").attr("src","/api/img/restaurant/"+r.key.restaurantView.img_file)
-            $(".restaurant_title").html(r.key.restaurantView.ri_name);
-            $(".category").html(r.key.restaurantView.cate_name);
-            $(".min_price").html(r.key.restaurantView.ri_min_price+"원");
-            $(".delivery_fee").html(r.key.restaurantView.ri_delivery_fee+"원");
-            $(".open_time").html(r.key.restaurantView.ri_open_time);
-            $(".end_time").html(r.key.restaurantView.ri_end_time);
+            $(".restaurant_img").attr("src","/api/img/restaurant/"+r.resultData.restInfo.restImgFile)
+            $(".restaurant_title").html(r.resultData.restInfo.restName);
+            $(".category").html(r.resultData.restInfo.cateName);
+            $(".min_price").html(r.resultData.restInfo.restMinPrice+"원");
+            $(".delivery_fee").html(r.resultData.restInfo.restDeliveryFee+"원");
+            $(".open_time").html(r.resultData.restInfo.restOpenTime);
+            $(".end_time").html(r.resultData.restInfo.restEndTime);
+            $(".rest_desc").html(r.resultData.restInfo.restDescription);
             
-            //dish_list_area안쪽 dish_list태그
             let full_tag = "";
             
-            if(r.key.dishList.length!=null){
-                for(let i = 0; i < r.key.dishList.length; i++) {
+            if(r.resultData.dishList==null){
+                full_tag = "<a href='#'>등록된 메뉴가 없습니다. 지금 등록하기</a>";
+                $(".dish_area").append(full_tag);
+                return;
+            }
+            else{
+                for(let i = 0; i < r.resultData.dishList.length; i++) {
                     //aside메뉴 태그
-                    let tag='<li>'+r.key.dishList[i].di_name+" "+r.key.dishList[i].di_price+'</li>';
+                    let tag='<li>'+r.resultData.dishList[i].dishName+" "+r.resultData.dishList[i].dishPrice+'</li>';
                     $(".dish_list").append(tag);
-
                     let dish_list_tag=
                         '<div class="dish_list_wrap">'+
                             '<div class="content_left_box">'+
                                 '<div class="dish_img_area">'+
                                     '<a class="img_box_link" href="#">'+
-                                        '<img class="img_btn" onclick="'+open_img_box+'" src="/api/img/dish/'+r.key.dishList[i].dish_img_file+'" alt="">'+
-                                        '<img class="dish_img" src="/api/img/dish/'+r.key.dishList[i].dish_img_file+'" alt="">'+
+                                        '<img class="img_btn" onclick="open_img_box('+r.resultData.dishList[i].dishSeq+')" src="/api/img/dish/'+r.resultData.dishList[i].dishImgFile+'" alt="">'+
+                                        '<img class="dish_img" src="/api/img/dish/'+r.resultData.dishList[i].dishImgFile+'" alt="">'+
                                     '</a>'+
                                 '</div>'+
                                 '<div class="dish_title_area">'+
-                                    '<h1>'+r.key.dishList[i].di_name+'</h1>'+
+                                    '<h1>'+r.resultData.dishList[i].dishName+'</h1>'+
                                 '</div>'+
                             '</div>'+
                             '<div class="content_right_box">'+
                                 '<div class="dish_block">'+
-                                    '<p>가격<span class="sep"> | </span>'+r.key.dishList[i].di_price+'원</p>'+
-                                    '<p class="descfffff">'+r.key.dishList[i].di_description+'</p>'+
+                                    '<p>가격<span class="sep"> | </span>'+r.resultData.dishList[i].dishPrice+'원</p>'+
+                                    '<p class="desc">'+r.resultData.dishList[i].dishDescription+'</p>'+
                                 '</div>'+
                                 '<div class="option_area">';
                                 full_tag += dish_list_tag;
-                                    if(r.key.dishList[i].blockList.length!=null){
-                                        for(let j = 0; j < r.key.dishList[i].blockList.length; j++) {
+                                    if(r.resultData.dishList[i].blockList!=null){
+                                        if(r.resultData.dishList[i].blockList==0){
+                                            let no_block_tag = "<a id='no_block' href='#'>등록된 옵션이 없습니다. 지금 등록하기</a>";
+                                            full_tag += no_block_tag;
+                                        }
+                                        for(let j = 0; j < r.resultData.dishList[i].blockList.length; j++) {
                                             let option_box_tag1 =
                                             '<div class="option_block">'+
-                                                '<h3 class="option_title">'+r.key.dishList[i].blockList[j].opt_title+'</h3>';
+                                                '<h3 class="option_title">'+r.resultData.dishList[i].blockList[j].optionTitle+'|</h3>';
                                                 full_tag += option_box_tag1;
-                                                if(r.key.dishList[i].blockList[j].descList.length!=null){
-                                                    for(let k = 0; k< r.key.dishList[i].blockList[j].descList.length; k++) {
-                                                        let option_desc_tag = '<p class="option_desc">'+r.key.dishList[i].blockList[j].descList[k].desc_name+'|'+r.key.dishList[i].blockList[j].descList[k].desc_price+'</p>'
+                                                if(r.resultData.dishList[i].blockList[j].descList!=null){
+                                                    for(let k = 0; k< r.resultData.dishList[i].blockList[j].descList.length; k++) {
+                                                        let option_desc_tag = '<p class="option_desc">'+r.resultData.dishList[i].blockList[j].descList[k].descText+'|'+r.resultData.dishList[i].blockList[j].descList[k].dishPrice+'</p>'
                                                         full_tag += option_desc_tag;                            
                                                     }
                                                 }
@@ -75,6 +83,8 @@ $(function(){
                 }
             }
             $(".dish_area").append(full_tag);
+
+
         }
 
 
@@ -82,8 +92,8 @@ $(function(){
 })
 
 
-function open_img_box(mode){
-        $(".img_popup_area").show();
-        seq = $(this).attr("data-seq");
-        $(".name").html($(this).attr("name"));
+function open_img_box(dishSeq){
+    seq = dishSeq
+    $(".img_popup_area").css({"display":"block"});
+    imgView(type,0,seq);
 }

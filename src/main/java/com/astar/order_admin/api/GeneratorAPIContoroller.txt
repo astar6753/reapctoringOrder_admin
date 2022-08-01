@@ -1,0 +1,163 @@
+package com.astar.order_admin.api;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.astar.order_admin.data.request.dish.DishRequestVO;
+import com.astar.order_admin.data.request.member.MemberRequestVO;
+import com.astar.order_admin.data.request.order.OrderEachRequestVO;
+import com.astar.order_admin.data.request.order.OrderRequestVO;
+import com.astar.order_admin.data.request.order.SelectedOptionRequestVO;
+import com.astar.order_admin.data.response.dish.DishResponseVo;
+import com.astar.order_admin.mapper.GeneratorMapper;
+
+
+@RestController
+@RequestMapping("/api/generate")
+public class GeneratorAPIContoroller {
+    @Autowired GeneratorMapper generatorMapper;
+    @Value("${history.dir.path}") String path;
+    @Value("${history.file.encoding}") String encoding;
+    @Value("${history.spool.path}") String spoolDir;    
+
+    private static String[] alphaLower = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"};
+    private static String[] alphaUpper = new String[26];
+    private static String[] firstName = {"김","이","박","최","정","강","조","윤","장","임","한","오","서","신","권"};
+    private static String[] middleName = {"주","정","승","소","윤","민","하","호","정","서","홍","기","인","태","상"};
+    private static String[] lastName = {"민","진","혁","원","미","성","람","진","준","숙","원","호","수","은","율"};
+    private String makeName(){
+        String name = "";
+        name+=firstName[(int)(Math.random()*firstName.length)];
+        name+=middleName[(int)(Math.random()*middleName.length)];
+        name+=lastName[(int)(Math.random()*lastName.length)];
+        return name;
+    }
+    
+    private String makeID(Integer len){
+        String id = "";
+        for(int i=0; i<len; i++){
+            int r = (int)(Math.random()*2);
+            if(r==0){
+                id+= alphaLower[(int)(Math.random()*alphaLower.length)];
+            }
+            else{
+                id+= alphaUpper[(int)(Math.random()*alphaUpper.length)];
+            }
+        }
+        return id;
+    }
+    
+    public static Date makeDateTime(Integer min, Integer max, Boolean genTime){
+        Integer diff = max - min;
+        Integer year = (int)(Math.random()*diff+min);
+        Integer month = (int)(Math.random()*12+1);
+        Integer date = (int)(Math.random()*28+1);
+        // dt = year+"-"+leadingZero(month)+"-"+leadingZero(date)+" 00:00:00";
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.YEAR,year);
+        c.set(Calendar.MONTH,month);
+        c.set(Calendar.DATE,date);
+        if(!genTime){
+            c.set(Calendar.HOUR,0);
+            c.set(Calendar.MINUTE,0);
+            c.set(Calendar.SECOND,0);
+        }
+        else{        
+            c.set(Calendar.HOUR,(int)(Math.random()*24));
+            c.set(Calendar.MINUTE,(int)(Math.random()*60));
+            c.set(Calendar.SECOND,(int)(Math.random()*60));
+        }
+        c.set(Calendar.MILLISECOND,0);
+        return c.getTime();
+    }
+    
+    public static String leadingZero(Integer n){
+        return n<10?"0"+n:""+n;
+    }
+
+    public GeneratorAPIContoroller() {
+        for(int i=0; i<26; i++) {alphaUpper[i] = alphaLower[i].toUpperCase();}
+    }
+
+    // 더미 user 생성
+    @GetMapping("/user")
+    public void generateRandomUsers(@RequestParam Integer cnt) {
+        List<MemberRequestVO> userDatas = new ArrayList<MemberRequestVO>();
+        for(int i=0; i<cnt; i++){
+            MemberRequestVO user = new MemberRequestVO();
+            user.setMemberId(makeID((int)(Math.random()*6+6)));
+            user.setMemberPwd("4g9CwF3G17sk3kn/7DQTeQ==");
+            user.setMemberName(makeName());
+            user.setMemberPhone("010-"+(int)(Math.random()*10000)+"-"+(int)(Math.random()*10000));
+            user.setMemberAddress("주소가 어쩌시 저쩌구 무슨동");
+
+            userDatas.add(user);           
+        }
+        // System.out.println(userDatas);
+        generatorMapper.insertMemberInfos(userDatas);
+        System.out.println("회원정보 "+cnt+"개 추가");
+    }
+
+    // order더미 생성
+    @GetMapping("/order")
+    public String generateRandomOrder(@RequestParam Integer cnt) {
+        List<Integer> memberList = generatorMapper.selectMemberSeqList();
+        List<Integer> restList = generatorMapper.selectRestaurantSeqList();
+        List<OrderRequestVO> orderList = new ArrayList<OrderRequestVO>();
+        List<OrderEachRequestVO> eachList = new ArrayList<OrderEachRequestVO>();
+        List<SelectedOptionRequestVO> optionList = new ArrayList<SelectedOptionRequestVO>();
+
+        for(int i=0; i<cnt; i++){
+            OrderRequestVO data = new OrderRequestVO();
+            Integer r = (int)(Math.random()*memberList.size());
+            data.setOi_mi_seq(memberList.get(r));
+            r = (int)(Math.random()*restList.size());
+            data.setOi_ri_seq(restList.get(r));
+            data.setOi_reg_dt(makeDateTime(2020, 2023, true));
+            data.setOi_address("주소가 어쩌구 저쩌구 멀리도 산다야");
+            
+            orderList.add(data);
+
+            List<Integer> orderList2 = generatorMapper.selectOrderSeqList();
+            List<Integer> dishList = generatorMapper.selectDishSeqList(restList.get(r));
+            int eachCnt = (int)(Math.random()*3+1);
+            for(int j=0; j<eachCnt; j++){
+                OrderEachRequestVO each = new OrderEachRequestVO();
+                Integer ran = (int)(Math.random()*orderList2.size());
+                each.setEach_oi_seq(orderList2.get(ran));
+                each.setEach_di_seq(dishList.get(ran));
+                each.setEach_quantity((int)(Math.random()*3+1));
+                
+                eachList.add(each);
+
+                int optCnt = (int)(Math.random()*3+1);
+                for(int k=0; k<optCnt; k++){
+                    SelectedOptionRequestVO option = new SelectedOptionRequestVO();
+                    Integer rand = (int)(Math.random()*eachList.size());
+                
+                    option.setSel_desc_seq(sel_desc_seq);
+                    option.setSel_each_seq(sel_each_seq);
+                }
+            }
+        }
+        generatorMapper.insertOrderInfos(orderList);
+
+
+        return "주문이 "+cnt+"개 생성됨";
+    }
+
+
+        
+}
+
+
+

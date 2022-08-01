@@ -14,7 +14,7 @@ public interface ImgMapper {
     public String selectImgBackNameByImgSeq(Integer imgSeq);
 
     public void deleteImgInfoByImgSeq(Integer imgSeq);
-    public void updateRestaurantImg(Integer img_seq, Integer restSeq);
-    public void updateDishImg(Integer img_seq, Integer dishSeq);
-    public void updateMemberImg(Integer img_seq, Integer memberSeq);
+    public void updateRestaurantImg(Integer imgSeq, Integer restSeq);
+    public void updateDishImg(Integer imgSeq, Integer dishSeq);
+    public void updateMemberImg(Integer imgSeq, Integer memberSeq);
 }

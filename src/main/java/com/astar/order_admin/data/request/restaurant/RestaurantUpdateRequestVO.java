@@ -5,12 +5,12 @@ import lombok.Data;
 @Data
 public class RestaurantUpdateRequestVO {
     private Integer restSeq;
-    private Integer meberSeq;
+    private Integer memberSeq;
+    private Integer cateSeq;
     private String restName;
     private Integer restMinPrice;
     private Integer restDeliveryFee;
     private String restAddress;
-    private Integer restCateSeq;
     private String restOpenTime;
     private String restEndTime;
     private String restDescription;
